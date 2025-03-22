@@ -2,21 +2,25 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { auth } from './firebaseConfig';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { Ionicons } from '@expo/vector-icons';
 
 const SignUpScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignUp = async () => {
-    if (!email || !password) {
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPassword = password.trim();
+    if (!trimmedEmail || !trimmedPassword) {
       Alert.alert('Error', 'Please fill all fields');
       return;
     }
 
     setLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, trimmedEmail, trimmedPassword);
       await sendEmailVerification(userCredential.user);
       Alert.alert('Success', 'Verification email sent! Check your inbox.');
       navigation.navigate('Login');
@@ -47,8 +51,15 @@ const SignUpScreen = ({ navigation }: any) => {
         placeholderTextColor="#999"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
+        secureTextEntry={!showPassword}
       />
+      <TouchableOpacity
+          style={styles.eyeIcon}
+          onPress={() => setShowPassword(!showPassword)}
+        >
+          <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={24} color="#999" />
+        </TouchableOpacity>
+      
 
       <TouchableOpacity
         style={styles.button}
@@ -100,6 +111,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 20,
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 30,
+    top: 372,
   },
   buttonText: {
     color: 'white',

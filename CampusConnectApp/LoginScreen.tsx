@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityInd
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from './firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { sendPasswordResetEmail} from 'firebase/auth';
 
 const LoginScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
@@ -11,14 +12,16 @@ const LoginScreen = ({ navigation }: any) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
-    if (!email || !password) {
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPassword = password.trim();
+    if (!trimmedEmail|| !trimmedPassword) {
       Alert.alert('Error', 'Please fill all fields');
       return;
     }
 
     setLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth,trimmedEmail, trimmedPassword);
       if (!userCredential.user.emailVerified) {
         Alert.alert('Warning', 'Verify your email first!');
         await auth.signOut();
@@ -30,6 +33,34 @@ const LoginScreen = ({ navigation }: any) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleForgotPassword = async () => {
+    const trimmedEmail = email.trim().toLowerCase();
+    
+    if (!trimmedEmail) {
+      Alert.alert('Error', 'Please enter your registered email');
+      return;
+    }
+  
+    try {
+      await sendPasswordResetEmail(auth, trimmedEmail);
+      Alert.alert('Success', `Reset link sent to ${trimmedEmail}`);
+    } catch (error: any) {
+      let message = 'Password reset failed';
+      switch (error.code) {
+        case 'auth/user-not-found':
+          message = 'No account with this email';
+          break;
+          case 'auth/user-disabled':
+          message = 'Account disabled';
+          break;
+        case 'auth/invalid-email':
+          message = 'Invalid email format';
+          break;
+      }
+      Alert.alert('Error', message);
+    }
   };
 
   return (
@@ -84,7 +115,7 @@ const LoginScreen = ({ navigation }: any) => {
       </TouchableOpacity>
 
       {/* Forgot Password Link */}
-      <TouchableOpacity onPress={() => Alert.alert('Info', 'Password reset coming soon!')}>
+      <TouchableOpacity onPress={(handleForgotPassword) => Alert.alert('Info', 'Password reset coming soon!')}>
         <Text style={styles.linkText}>Forgot Password?</Text>
       </TouchableOpacity>
     </View>
