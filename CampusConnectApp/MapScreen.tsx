@@ -35,7 +35,7 @@ const KabarakUniversityMap = () => {
     },
     {
       id: 4,
-      name: 'Mess',
+      name: 'Zarephath-Mess',
       latitude: -0.166208,
       longitude: 35.966453,
     },
