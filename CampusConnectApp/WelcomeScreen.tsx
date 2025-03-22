@@ -1,11 +1,20 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
+import { auth } from './firebaseConfig';
 
 const WelcomeScreen = () => {
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Heeeeyy 🎉</Text>
-      <Text style={styles.subtext}>Welcome to Campus Connect!</Text>
+      <Text style={styles.title}>Welcome to Campus Connect! 🎉</Text>
+      <Button title="Logout" onPress={handleLogout} color="#1a73e8" />
     </View>
   );
 };
@@ -17,15 +26,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#0a192f',
   },
-  text: {
-    fontSize: 48,
-    color: '#fff',
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  subtext: {
+  title: {
     fontSize: 24,
-    color: '#4a6fa5',
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 30,
   },
 });
 

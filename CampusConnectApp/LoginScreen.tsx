@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { auth } from './firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
@@ -7,6 +8,7 @@ const LoginScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -16,8 +18,13 @@ const LoginScreen = ({ navigation }: any) => {
 
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate('Welcome');
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      if (!userCredential.user.emailVerified) {
+        Alert.alert('Warning', 'Verify your email first!');
+        await auth.signOut();
+      } else {
+        navigation.replace('Welcome');
+      }
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Login failed');
     } finally {
@@ -29,6 +36,7 @@ const LoginScreen = ({ navigation }: any) => {
     <View style={styles.container}>
       <Text style={styles.title}>Campus Connect</Text>
 
+      {/* Email Input */}
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -39,15 +47,25 @@ const LoginScreen = ({ navigation }: any) => {
         keyboardType="email-address"
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#999"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+      {/* Password Input */}
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#999"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+        />
+        <TouchableOpacity
+          style={styles.eyeIcon}
+          onPress={() => setShowPassword(!showPassword)}
+        >
+          <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={24} color="#999" />
+        </TouchableOpacity>
+      </View>
 
+      {/* Login Button */}
       <TouchableOpacity
         style={styles.button}
         onPress={handleLogin}
@@ -59,6 +77,16 @@ const LoginScreen = ({ navigation }: any) => {
           <Text style={styles.buttonText}>Login</Text>
         )}
       </TouchableOpacity>
+
+      {/* Sign Up Link */}
+      <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+        <Text style={styles.linkText}>Don't have an account? Sign Up</Text>
+      </TouchableOpacity>
+
+      {/* Forgot Password Link */}
+      <TouchableOpacity onPress={() => Alert.alert('Info', 'Password reset coming soon!')}>
+        <Text style={styles.linkText}>Forgot Password?</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -68,7 +96,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#0a192f', // Dark blue night sky
+    backgroundColor: '#0a192f',
   },
   title: {
     fontSize: 36,
@@ -76,33 +104,42 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
     marginBottom: 50,
-    textShadowColor: 'rgba(255,255,255,0.3)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
   },
   input: {
     height: 50,
-    borderWidth: 1,
     borderColor: '#2e3d5f',
+    borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 15,
     marginBottom: 20,
-    fontSize: 16,
     color: '#fff',
     backgroundColor: '#1a2a4a',
   },
+  passwordContainer: {
+    position: 'relative',
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 15,
+    top: 13,
+  },
   button: {
     height: 50,
-    borderRadius: 10,
     backgroundColor: '#4a6fa5',
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
+    marginVertical: 20,
   },
   buttonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: '600',
+  },
+  linkText: {
+    color: '#4a6fa5',
+    textAlign: 'center',
+    marginTop: 10,
   },
 });
 

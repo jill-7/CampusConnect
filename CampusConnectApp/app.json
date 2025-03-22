@@ -4,25 +4,38 @@
     "slug": "CampusConnectApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/kaba.jpeg",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/kaba-admin.jpeg",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jilloh.CampusConnectApp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
+    "android": { 
+      "permissions": ["INTERNET", "ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
+      "softwareKeyboardLayoutMode": "pan",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/kaba.jpeg",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.jilloh.CampusConnect",
+      "versionCode": 1
+    },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/kaba.jpeg"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "81ae3a17-895c-461f-9278-15a6cd34dc01"
+      }
     }
   }
 }

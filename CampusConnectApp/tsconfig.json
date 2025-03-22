@@ -11,10 +11,12 @@
     ],
     "moduleResolution": "node",
     "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "typeRoots": [
       "./node_modules/@types",
-      "./node_modules/react"
+      "./node_modules/react",
+      "./types"
     ],
     "paths": {
       "firebase/*": [
@@ -29,7 +31,8 @@
     },
     "types": [
       "react",
-      "react-native"
+      "react-native",
+      
     ]
   },
   "exclude": [
