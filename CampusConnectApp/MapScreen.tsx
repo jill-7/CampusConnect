@@ -1,9 +1,11 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import React, {useEffect} from 'react';
+import { StyleSheet, View, Alert, PermissionsAndroid } from 'react-native';
+import MapView, {Marker, UrlTile} from 'react-native-maps';
+
+
 
 const KabarakUniversityMap = () => {
-  
+   
   const initialRegion = {
     latitude: -0.167241,
     longitude: 35.964891,
@@ -45,14 +47,29 @@ const KabarakUniversityMap = () => {
     }
   ];
 
+  useEffect(() => {
+    PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+    ).catch(() => Alert.alert('Allow location access'));
+  }, []);
+
+
+
+
+
   return (
     <View style={styles.container}>
       <MapView
         style={styles.map}
         initialRegion={initialRegion}
-        provider={PROVIDER_GOOGLE}
-        customMapStyle={mapStyle}
+        onMapReady={() => console.log('Map Ready')}
       >
+
+        <UrlTile
+         urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+         maximumZ={19}
+         tileSize={256}
+         />
         {buildings.map((building) => (
           <Marker
             key={building.id}

@@ -20,14 +20,14 @@
       }
     },
     "android": { 
-      "permissions": ["INTERNET", "ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
+      "permissions": ["INTERNET", "ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "ACCESS_NETWORK_STATE"],
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/kaba.jpeg",
         "backgroundColor": "#ffffff"
       },
       "package": "com.jilloh.CampusConnect",
-      "versionCode": 1
+      "versionCode": 20250322
     },
     "web": {
       "favicon": "./assets/kaba.jpeg"
