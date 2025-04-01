@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
     import { getAuth, GoogleAuthProvider } from 'firebase/auth';
     import { getFirestore} from 'firebase/firestore';
+   
 
 // Got these details from Firebase after creating my project
 

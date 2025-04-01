@@ -8,11 +8,11 @@ const AuthLoadingScreen = ({ navigation }: any) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       // If user exists and email is verified they head to Welcome Screen
       if (user?.emailVerified) {
-        navigation.replace('Welcome');
+        navigation.replace('Home');
       } 
       // Otherwise they go back to Login Screen
       else {
-        navigation.replace('Home');
+        navigation.replace('Login');
       }
     });
 

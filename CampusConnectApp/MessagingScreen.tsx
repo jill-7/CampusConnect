@@ -1,106 +1,90 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   View, Text, TextInput, TouchableOpacity, StyleSheet, Platform 
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { KeyboardAvoidingView } from 'react-native';
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
+import { db, auth } from './firebaseConfig';
+import { collection, addDoc, query, where, onSnapshot, orderBy, serverTimestamp} from 'firebase/firestore';
+import { and, or } from 'firebase/firestore';
+
 
 type Message = {
   id: string;
   text: string;
   createdAt: Date;
   isUser: boolean;
+  senderId: string;
 };
 
-const default_response = "I cannot assist with that. Please ask for something else :)";
-const BOT_RESPONSES = [
-  {
-    keywords: ['hello', 'hi', 'hey'],
-    responses: ['Hi there!', 'Hello!', 'Hey! 👋']
-  },
-  {
-    keywords: ['help', 'support'],
-    responses: ['How can I assist you?', 'What do you need help with?']
-  },
-  {
-    keywords: ['thanks', 'thank you'],
-    responses: ['You\'re welcome!', 'Happy to help! 😊']
-  },
-  {
-    keywords: ['event', 'events'],
-    responses: ['Head to the events tab', 'You can find that information on the events tab']
-  },
-  {
-    keywords: ['map', 'directions'],
-    responses: ['Our app has coordinates that i think will be helpful to you', 'Do not hesitate to ask for help']
-  },
-  {
-    keywords: ['name', 'call'],
-    responses: ['I am a chatbot', 'You can call me whatever you wish :)']
-  },
-  {
-    keywords: ['bye', 'goodbye'],
-    responses: ['Goodbye!', 'See you later! 👋']
-  },
-  {
-    keywords: ['*'],
-    responses: [default_response]
-  },
-  
-
-];
 
 
-
-const MessagingScreen = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: 'Welcome! How can I assist you today?',
-      createdAt: new Date(),
-      isUser: false,
-    },
-  ]);
+const MessagingScreen = ({ route }: any) => {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const flatListRef = useRef<KeyboardAwareFlatList>(null);
 
-  const sendMessage = () => {
+  const otherUserId  = route?.params?.otherUserId || 'user2';
+  const currentUserId = auth.currentUser?.uid || 'user1';
+ 
+
+  useEffect(()  => {
+
+    if (!currentUserId || !otherUserId) return;
+
+    const messagesQuery = query(
+      collection(db, 'messages'),
+      or(
+        and(
+         where('senderId', '==', currentUserId),
+         where('receiverId', '==', otherUserId)
+        ),
+        and(
+          where('senderId', '==', otherUserId),
+          where('receiverId', '==', currentUserId)
+         )
+        ),
+      orderBy('createdAt', 'asc')
+    );
+
+    const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
+      const loadedMessages: Message[] = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        loadedMessages.push({
+          id: doc.id,
+          text: data.text,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          isUser: data.senderId === currentUserId, // Styles bubbles correctly
+          senderId: data.senderId,
+        });
+      });
+      console.log("ALL MESSAGES:", loadedMessages);
+      setMessages(loadedMessages);
+    });
+
+    return unsubscribe; // Stop listening when screen closes
+  }, [currentUserId, otherUserId]);
+
+  const sendMessage = async () => {
     if (newMessage.trim()) {
-      const userMessage: Message = {
-        id: Date.now().toString(),
+      await addDoc(collection(db, 'messages'), {
+        senderId: currentUserId,
+        receiverId: otherUserId,
         text: newMessage,
-        createdAt: new Date(),
-        isUser: true,
-      };
-
-      setMessages(prev => [...prev, userMessage]);
-      setNewMessage('');
-
-      const userText = newMessage.toLowerCase();
-      let responses: string[] = [];
-      
-      for (const rule of BOT_RESPONSES) {
-        if (rule.keywords.includes('*') || 
-            rule.keywords.some(keyword => userText.includes(keyword))) {
-          responses = rule.responses;
-          break;
-        }
-      }
-  
-
-      setTimeout(() => {
-        const botResponse: Message = {
-          id: (Date.now() + 1).toString(),
-          text: responses[Math.floor(Math.random() * responses.length)],
-          createdAt: new Date(),
-          isUser: false,
-        };
-        setMessages(prev => [...prev, botResponse]);
-      }, 1000);
-
+        createdAt: serverTimestamp(), // Auto-sets time
+      });
+      setNewMessage(''); // Clear input
     }
   };
+
+
+  
+      
+  
+
+   
 
   const renderMessage = ({ item }: { item: Message }) => (
     <View style={[

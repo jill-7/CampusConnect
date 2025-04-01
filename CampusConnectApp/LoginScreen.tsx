@@ -23,7 +23,7 @@ const LoginScreen = ({ navigation }: any) => {
         Alert.alert('Warning', 'Verify your email first!');
         await auth.signOut();
       } else {
-        navigation.replace('Welcome');
+        navigation.replace('Home');
       }
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Login failed');
