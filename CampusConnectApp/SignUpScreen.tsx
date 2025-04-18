@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
-import { auth } from './firebaseConfig';
+import { auth, db } from './firebaseConfig';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+
 
 const SignUpScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
@@ -17,6 +19,14 @@ const SignUpScreen = ({ navigation }: any) => {
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      setDoc(doc(db, 'users',userCredential.user.uid), {
+        email: userCredential.user.email,
+        createdAt: new Date(),
+        name: userCredential.user.email?.split('@')[0],
+      });
+
+
       await sendEmailVerification(userCredential.user);
       Alert.alert('Success', 'Verification email sent! Check your inbox.');
       navigation.navigate('Login');

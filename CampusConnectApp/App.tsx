@@ -7,6 +7,7 @@ import LoginScreen from './LoginScreen';
 import SignUpScreen from './SignUpScreen';
 import EventsScreen from './EventsScreen';
 import MapScreen from './MapScreen';
+import Contacts from './Contacts';
 import MessagingScreen from './MessagingScreen';
 
 const Stack = createStackNavigator();
@@ -30,6 +31,9 @@ function HomeTabs() {
             case 'Chat' :
             iconName = 'chatbubble-ellipses-outline';
             break;
+            case 'Contacts' :
+            iconName = 'people-outline';
+            break;
             default:
               iconName = 'help-circle-outline';
           }
@@ -47,6 +51,7 @@ function HomeTabs() {
       <Tab.Screen name="Events" component={EventsScreen} />
       <Tab.Screen name="Map" component={MapScreen} />
       <Tab.Screen name="Chat" component={MessagingScreen} />
+      <Tab.Screen name="Contacts" component={Contacts} />
     </Tab.Navigator>
   );
 }
@@ -59,6 +64,7 @@ export default function App() {
         <Stack.Screen name="AuthLoading" component={AuthLoadingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
+        <Stack.Screen name="Contacts" component={Contacts} />
         <Stack.Screen name="Home" component={HomeTabs} />
       </Stack.Navigator>
     </NavigationContainer>
